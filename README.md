@@ -1,1 +1,0 @@
-# sparkling-smile-dental-clinic
