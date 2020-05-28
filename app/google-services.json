@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1053113734481",
+    "firebase_url": "https://sparkling-smile-dental-clinic.firebaseio.com",
+    "project_id": "sparkling-smile-dental-clinic",
+    "storage_bucket": "sparkling-smile-dental-clinic.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1053113734481:android:6563d184bab60b3c182f70",
+        "android_client_info": {
+          "package_name": "com.example.sparklingsmiledentalclinic"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1053113734481-5jh9eak0cno94ohkjqvcfmf0jd4m1sci.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4cv4tqAX7k2MHIcNOKlbcfx2UTdv82HY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1053113734481-5jh9eak0cno94ohkjqvcfmf0jd4m1sci.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
