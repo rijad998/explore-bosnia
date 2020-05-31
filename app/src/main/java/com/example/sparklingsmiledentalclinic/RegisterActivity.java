@@ -3,6 +3,7 @@ package com.example.sparklingsmiledentalclinic;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -102,6 +103,8 @@ public class RegisterActivity extends AppCompatActivity {
                             progressBar.setVisibility(View.GONE);
                             if (task.isSuccessful()) {
                                 Toast.makeText(RegisterActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(RegisterActivity.this, InsideActivity.class));
+                                finish();
                             } else {
                                 Toast.makeText(RegisterActivity.this, "Adding additional data besides email and password failed!", Toast.LENGTH_SHORT).show();
                             }
