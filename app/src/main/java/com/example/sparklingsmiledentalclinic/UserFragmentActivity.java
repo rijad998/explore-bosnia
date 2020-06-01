@@ -59,9 +59,6 @@ public class UserFragmentActivity extends AppCompatActivity {
                     case R.id.navigation_appointment :
                         InitializeFragment(appointmentFragment);
                         return true;
-                    case R.id.navigation_gallery :
-                        InitializeFragment(galleryFragment);
-                        return true;
                 }
 
                 return false;

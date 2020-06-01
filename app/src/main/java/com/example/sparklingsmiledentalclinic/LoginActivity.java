@@ -68,8 +68,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()) {
+                    String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     progressBarLogin.setVisibility(View.GONE);
-                    startActivity(new Intent(LoginActivity.this, UserFragmentActivity.class));
+                    if (userId.equals("w6E5RW29UscvM7uYi13bEMPeTjx1")) {
+                        startActivity(new Intent(LoginActivity.this, AdminActivity.class));
+                    } else {
+                        startActivity(new Intent(LoginActivity.this, UserFragmentActivity.class));
+                    }
                     finish();
                 } else {
                     progressBarLogin.setVisibility(View.GONE);

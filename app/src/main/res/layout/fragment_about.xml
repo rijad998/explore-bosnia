@@ -7,14 +7,27 @@
     tools:context=".AboutFragment">
 
     <TextView
-        android:id="@+id/aboutTextView"
-        android:layout_width="wrap_content"
+        android:id="@+id/aboutUsTextView"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="About us fragment"
-        android:textColor="#ED0000"
-        android:textSize="36sp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/about_us_text"
+        android:textAlignment="viewStart"
+        android:textSize="21sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="270dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/teeth"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/aboutUsTextView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

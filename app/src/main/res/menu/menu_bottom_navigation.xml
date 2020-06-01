@@ -11,9 +11,5 @@
         android:icon="@drawable/ic_content_paste_black_24dp"
         android:title="Appointment" />
 
-    <item
-        android:id="@+id/navigation_gallery"
-        android:icon="@drawable/ic_collections_black_24dp"
-        android:title="Gallery" />
 
 </menu>
