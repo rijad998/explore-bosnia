@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,6 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
     EditText passwordEditText;
     Button registerProceed;
     ProgressBar progressBar;
+    TextView goToLoginActivity;
 
     private FirebaseAuth mAuth;
 
@@ -41,6 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
         registerProceed = findViewById(R.id.registerProceedBtn);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.GONE);
+        goToLoginActivity = findViewById(R.id.registerToLoginTextView);
 
         mAuth = FirebaseAuth.getInstance();
 
@@ -54,6 +57,14 @@ public class RegisterActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        goToLoginActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+                finish();
+            }
+        });
 
     }
 
@@ -103,7 +114,7 @@ public class RegisterActivity extends AppCompatActivity {
                             progressBar.setVisibility(View.GONE);
                             if (task.isSuccessful()) {
                                 Toast.makeText(RegisterActivity.this, "Registration Successful!", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(RegisterActivity.this, InsideActivity.class));
+                                startActivity(new Intent(RegisterActivity.this, UserActivity.class));
                                 finish();
                             } else {
                                 Toast.makeText(RegisterActivity.this, "Adding additional data besides email and password failed!", Toast.LENGTH_SHORT).show();
@@ -111,6 +122,11 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                     });
                 } else {
+                    nameEditText.getText().clear();
+                    emailEditText.getText().clear();
+                    phoneEditText.getText().clear();
+                    passwordEditText.getText().clear();
+                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(RegisterActivity.this, "Registration Failed!", Toast.LENGTH_SHORT).show();
                 }
             }
