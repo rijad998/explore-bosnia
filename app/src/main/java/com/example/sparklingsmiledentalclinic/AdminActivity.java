@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -46,7 +48,7 @@ public class AdminActivity extends AppCompatActivity {
         adminDateChooseBtn = (Button) findViewById(R.id.adminDateChooseBtn);
         adminAppointmentsLW = findViewById(R.id.adminAppointmentsLW);
         findAppoiontmentBtn = findViewById(R.id.findAppointmentsBtn);
-        findAppoiontmentBtn.setEnabled(false);
+        //findAppoiontmentBtn.setEnabled(false);
 
         adminLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,20 +78,22 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        /*
         if(adminDateTxtView.getText().equals("")){
-            findAppoiontmentBtn.setEnabled(false);
-        } else {
-            findAppoiontmentBtn.setEnabled(true);
+            //findAppoiontmentBtn.setEnabled(false);
+        } else {*/
+            //findAppoiontmentBtn.setEnabled(true);
             findAppoiontmentBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     returnTheAppointments();
                 }
             });
-        }
+        ///
     }
 
     public void returnTheAppointments(){
+
         final ArrayList<String> list = new ArrayList<>();
         final ArrayAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, list);
         adminAppointmentsLW.setAdapter(adapter);
@@ -98,19 +102,23 @@ public class AdminActivity extends AppCompatActivity {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 for(final DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    if(snapshot.equals(datec.getYear().toString())){
-                        reference.child(datec.getYear().toString()).addValueEventListener(new ValueEventListener() {
+                    if(snapshot.getKey().equals(datec.getYear().toString())){
+                        FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).addValueEventListener(new ValueEventListener() {
+
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 for(DataSnapshot snapshotM : dataSnapshot.getChildren()){
-                                    if(snapshotM.equals(datec.getMonth().toString())){
-                                        reference.child(datec.getMonth().toString()).addValueEventListener(new ValueEventListener() {
+                                    if(snapshotM.getKey().equals(datec.getMonth().toString())){
+                                        reference.child(datec.getYear().toString()).child(datec.getMonth().toString()).addValueEventListener(new ValueEventListener() {
+
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 for(DataSnapshot snapshotD : dataSnapshot.getChildren()){
-                                                    if(snapshotD.equals(datec.getDay().toString())){
-                                                        reference.child(datec.getDay().toString()).addValueEventListener(new ValueEventListener() {
+                                                    if(snapshotD.getKey().equals(datec.getDay().toString())){
+                                                        reference.child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString()).addValueEventListener(new ValueEventListener() {
+
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                                 list.clear();
