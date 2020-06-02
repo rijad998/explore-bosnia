@@ -39,7 +39,6 @@ public class AppointmentFragment extends Fragment {
     TextView pickDateTxtView;
     Button pickDateBtn;
     Button appointmentBtn;
-    //String nameOfUser;
     Appointment appointment;
     User user;
     Boolean alreadyExist;
