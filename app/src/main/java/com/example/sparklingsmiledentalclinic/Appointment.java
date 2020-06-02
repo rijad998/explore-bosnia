@@ -1,14 +1,14 @@
 package com.example.sparklingsmiledentalclinic;
 
 public class Appointment {
-    public String name, date;
+    public String name, phone;
 
     public Appointment(){
     }
 
-    public Appointment(String name, String date) {
+    public Appointment(String name, String phone) {
         this.name = name;
-        this.date = date;
+        this.phone = phone;
     }
 
     public String getName() {
@@ -19,11 +19,11 @@ public class Appointment {
         this.name = name;
     }
 
-    public String getDate() {
-        return date;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

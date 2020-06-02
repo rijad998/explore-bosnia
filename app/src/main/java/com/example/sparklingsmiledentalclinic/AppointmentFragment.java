@@ -39,7 +39,7 @@ public class AppointmentFragment extends Fragment {
     TextView pickDateTxtView;
     Button pickDateBtn;
     Button appointmentBtn;
-    String nameOfUser;
+    //String nameOfUser;
     Appointment appointment;
     User user;
     Boolean alreadyExist;
@@ -104,8 +104,7 @@ public class AppointmentFragment extends Fragment {
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                     if (snapshot.getKey().equals(currentUserID)){
                          user = snapshot.getValue(User.class);
-                         nameOfUser = user.getName();
-                         appointment = new Appointment(nameOfUser, pickDateTxtView.getText().toString());
+                         appointment = new Appointment(user.getName(), user.getPhone());
                          checkTheDatabase();
                          break;
                     }
@@ -158,7 +157,6 @@ public class AppointmentFragment extends Fragment {
     }
 
     public void addAnAppointment() {
-        Toast.makeText(getActivity(), appointment.getName(), Toast.LENGTH_LONG).show();
         FirebaseDatabase.getInstance().getReference().child("Appointments").child(pickDateTxtView.getText().toString()).setValue(appointment).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
