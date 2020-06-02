@@ -15,6 +15,8 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,11 +25,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
-import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
  */
+
 public class AppointmentFragment extends Fragment {
 
     public AppointmentFragment() {
@@ -38,6 +40,9 @@ public class AppointmentFragment extends Fragment {
     Button pickDateBtn;
     Button appointmentBtn;
     String nameOfUser;
+    Appointment appointment;
+    User user;
+    Boolean alreadyExist;
 
     Calendar c;
     DatePickerDialog dpd;
@@ -50,7 +55,7 @@ public class AppointmentFragment extends Fragment {
 
         pickDateTxtView = (TextView) v.findViewById(R.id.pickDateTxtView);
         pickDateBtn = (Button) v.findViewById(R.id.pickDateBtn);
-        appointmentBtn = v.findViewById(R.id.makeAnAppointment);
+        appointmentBtn = v.findViewById(R.id.makeAnAppointmentBtn);
 
 
         pickDateBtn.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +69,7 @@ public class AppointmentFragment extends Fragment {
                 dpd = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int mYear, int mMonth, int mDayOfMonth) {
-                        pickDateTxtView.setText(mDayOfMonth + "/" + (mMonth + 1) + "/" + mYear);
+                        pickDateTxtView.setText(mYear + "/" + (mMonth + 1) + "/" + mDayOfMonth);
                     }
                 }, year, month, day);
                 dpd.show();
@@ -74,10 +79,14 @@ public class AppointmentFragment extends Fragment {
         appointmentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (pickDateTxtView.equals("")) {
-                    //Toast.makeText(getActivity().getApplicationContext(),"You need to pick a date for an appointment", Toast.LENGTH_SHORT).show();
+                if (pickDateTxtView.getText().toString().equals("")) {
+                    Toast.makeText(getActivity(),"You need to pick a date for an appointment", Toast.LENGTH_LONG).show();
                 } else {
-                    makeAnAppointment();
+                    try {
+                        getAnAppointment();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -85,16 +94,21 @@ public class AppointmentFragment extends Fragment {
         return v;
     }
 
-    public void makeAnAppointment(){
+    public void getAnAppointment(){
+        final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        DatabaseReference userReference = FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference userReference = FirebaseDatabase.getInstance().getReference().child("Users");
         userReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    User user = snapshot.getValue(User.class);
-                    nameOfUser = user.getName().toString();
-                    Log.i("JOOOJ", pickDateTxtView + " : " + nameOfUser);
+                    if (snapshot.getKey().equals(currentUserID)){
+                         user = snapshot.getValue(User.class);
+                         nameOfUser = user.getName();
+                         appointment = new Appointment(nameOfUser, pickDateTxtView.getText().toString());
+                         checkTheDatabase();
+                         break;
+                    }
                 }
             }
 
@@ -103,8 +117,57 @@ public class AppointmentFragment extends Fragment {
 
             }
         });
+    }
 
-        //FirebaseDatabase.getInstance().getReference().child("Appointments").updateChildren(appointment);
+    public void checkTheDatabase() {
+        alreadyExist = false;
+        final DatabaseReference userReference = FirebaseDatabase.getInstance().getReference().child("Appointments");
+        userReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                   if (snapshot.equals(pickDateTxtView.getText())){
+                        alreadyExist = true;
+                        userReference.child(pickDateTxtView.getText().toString()).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                long numberOfAppointments = dataSnapshot.getChildrenCount();
+                                if (numberOfAppointments < 11) {
+                                    addAnAppointment();
+                                } else {
+                                    Toast.makeText(getActivity(), "Sorry but there are no available appointments on " + pickDateTxtView.getText(), Toast.LENGTH_LONG).show();
+                                }
+                            }
 
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                            }
+                        });
+                    }
+                }
+                if(!alreadyExist){
+                    addAnAppointment();
+                }
+            };
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void addAnAppointment() {
+        Toast.makeText(getActivity(), appointment.getName(), Toast.LENGTH_LONG).show();
+        FirebaseDatabase.getInstance().getReference().child("Appointments").child(pickDateTxtView.getText().toString()).setValue(appointment).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    Toast.makeText(getActivity(), "Appointment successfully addedd", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Hmmm, something went wrong... Please try again.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
