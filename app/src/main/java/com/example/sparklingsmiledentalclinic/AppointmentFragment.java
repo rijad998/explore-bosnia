@@ -42,7 +42,7 @@ public class AppointmentFragment extends Fragment {
     Appointment appointment;
     User user;
     Boolean alreadyExist;
-
+    DateC datec;
     Calendar c;
     DatePickerDialog dpd;
 
@@ -69,6 +69,7 @@ public class AppointmentFragment extends Fragment {
                     @Override
                     public void onDateSet(DatePicker view, int mYear, int mMonth, int mDayOfMonth) {
                         pickDateTxtView.setText(mYear + "/" + (mMonth + 1) + "/" + mDayOfMonth);
+                        datec = new DateC(mDayOfMonth, (mMonth + 1), mYear);
                     }
                 }, year, month, day);
                 dpd.show();
@@ -118,22 +119,57 @@ public class AppointmentFragment extends Fragment {
     }
 
     public void checkTheDatabase() {
+
         alreadyExist = false;
         final DatabaseReference userReference = FirebaseDatabase.getInstance().getReference().child("Appointments");
         userReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                   if (snapshot.equals(pickDateTxtView.getText())){
-                        alreadyExist = true;
-                        userReference.child(pickDateTxtView.getText().toString()).addValueEventListener(new ValueEventListener() {
+
+                   if (snapshot.getKey().equals(datec.getYear().toString())){
+
+                        userReference.child(datec.getYear().toString()).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                long numberOfAppointments = dataSnapshot.getChildrenCount();
-                                if (numberOfAppointments < 11) {
-                                    addAnAppointment();
-                                } else {
-                                    Toast.makeText(getActivity(), "Sorry but there are no available appointments on " + pickDateTxtView.getText(), Toast.LENGTH_LONG).show();
+                                for(DataSnapshot snapshotM : dataSnapshot.getChildren()){
+
+                                    if (snapshotM.getKey().equals(datec.getMonth().toString())){
+
+                                        userReference.child(datec.getYear().toString()).child(datec.getMonth().toString()).addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                for(DataSnapshot snapshotD : dataSnapshot.getChildren()){
+
+                                                    if (snapshotD.getKey().equals(datec.getDay().toString())){
+
+                                                        userReference.child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString()).addValueEventListener(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                long numberOfAppointments = dataSnapshot.getChildrenCount();
+                                                                alreadyExist = true;
+                                                                if (numberOfAppointments < 11) {
+                                                                    addAnAppointment();
+                                                                    return;
+                                                                } else {
+                                                                    Toast.makeText(getActivity(), "Sorry but there are no available appointments on " + pickDateTxtView.getText(), Toast.LENGTH_LONG).show();
+                                                                }
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                            }
+                                        });
+                                    }
                                 }
                             }
 
@@ -143,9 +179,6 @@ public class AppointmentFragment extends Fragment {
                         });
                     }
                 }
-                if(!alreadyExist){
-                    addAnAppointment();
-                }
             };
 
             @Override
@@ -153,10 +186,14 @@ public class AppointmentFragment extends Fragment {
 
             }
         });
+
+        if(!alreadyExist){
+            addAnAppointment();
+        }
     }
 
     public void addAnAppointment() {
-        FirebaseDatabase.getInstance().getReference().child("Appointments").child(pickDateTxtView.getText().toString()).setValue(appointment).addOnCompleteListener(new OnCompleteListener<Void>() {
+        FirebaseDatabase.getInstance().getReference().child("Appointments").child(pickDateTxtView.getText().toString()).push().setValue(appointment).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){

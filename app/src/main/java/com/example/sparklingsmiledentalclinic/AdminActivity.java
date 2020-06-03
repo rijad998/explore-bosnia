@@ -36,7 +36,7 @@ public class AdminActivity extends AppCompatActivity {
     DatePickerDialog dpd;
     DateC datec;
     ListView adminAppointmentsLW;
-    Button findAppoiontmentBtn;
+    Button findAppointmentBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +47,7 @@ public class AdminActivity extends AppCompatActivity {
         adminDateTxtView = (TextView) findViewById(R.id.adminDateTxtView);
         adminDateChooseBtn = (Button) findViewById(R.id.adminDateChooseBtn);
         adminAppointmentsLW = findViewById(R.id.adminAppointmentsLW);
-        findAppoiontmentBtn = findViewById(R.id.findAppointmentsBtn);
-        //findAppoiontmentBtn.setEnabled(false);
+        findAppointmentBtn = findViewById(R.id.findAppointmentsBtn);
 
         adminLogoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,18 +77,13 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
-        /*
-        if(adminDateTxtView.getText().equals("")){
-            //findAppoiontmentBtn.setEnabled(false);
-        } else {*/
-            //findAppoiontmentBtn.setEnabled(true);
-            findAppoiontmentBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    returnTheAppointments();
-                }
-            });
-        ///
+        findAppointmentBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                returnTheAppointments();
+            }
+        });
+
     }
 
     public void returnTheAppointments(){
