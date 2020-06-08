@@ -105,13 +105,13 @@ public class AdminActivity extends AppCompatActivity {
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                 for(DataSnapshot snapshotM : dataSnapshot.getChildren()){
                                     if(snapshotM.getKey().equals(datec.getMonth().toString())){
-                                        reference.child(datec.getYear().toString()).child(datec.getMonth().toString()).addValueEventListener(new ValueEventListener() {
+                                        FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).addValueEventListener(new ValueEventListener() {
 
                                             @Override
                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                 for(DataSnapshot snapshotD : dataSnapshot.getChildren()){
                                                     if(snapshotD.getKey().equals(datec.getDay().toString())){
-                                                        reference.child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString()).addValueEventListener(new ValueEventListener() {
+                                                        FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString()).addValueEventListener(new ValueEventListener() {
 
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

@@ -25,6 +25,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -102,11 +104,13 @@ public class AppointmentFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Log.i("SNAPSHOTS", snapshot.getKey());
                     if (snapshot.getKey().equals(currentUserID)){
-                         user = snapshot.getValue(User.class);
-                         appointment = new Appointment(user.getName(), user.getPhone());
-                         checkTheDatabase();
-                         break;
+                        user = snapshot.getValue(User.class);
+                        appointment = new Appointment(user.getName(), user.getPhone());
+                        Log.i("SNAPSHOT KEY USER", snapshot.getKey() + " " + currentUserID);
+                        checkTheDatabase();
+                        break;
                     }
                 }
             }
@@ -130,31 +134,35 @@ public class AppointmentFragment extends Fragment {
 
                    if (snapshot.getKey().equals(datec.getYear().toString())){
 
-                        userReference.child(datec.getYear().toString()).addValueEventListener(new ValueEventListener() {
+                       FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).addValueEventListener(new ValueEventListener() {
                             @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                for(DataSnapshot snapshotM : dataSnapshot.getChildren()){
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshotK) {
+                                for(DataSnapshot snapshotM : dataSnapshotK.getChildren()){
 
                                     if (snapshotM.getKey().equals(datec.getMonth().toString())){
 
-                                        userReference.child(datec.getYear().toString()).child(datec.getMonth().toString()).addValueEventListener(new ValueEventListener() {
+                                        FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).addValueEventListener(new ValueEventListener() {
                                             @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                for(DataSnapshot snapshotD : dataSnapshot.getChildren()){
+                                            public void onDataChange(@NonNull DataSnapshot dataSnapshotL) {
+                                                for(DataSnapshot snapshotD : dataSnapshotL.getChildren()){
 
                                                     if (snapshotD.getKey().equals(datec.getDay().toString())){
 
-                                                        userReference.child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString()).addValueEventListener(new ValueEventListener() {
+                                                        FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString()).addValueEventListener(new ValueEventListener() {
                                                             @Override
-                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                long numberOfAppointments = dataSnapshot.getChildrenCount();
+                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshotF) {
+
+                                                                long numberOfAppointments = dataSnapshotF.getChildrenCount();
                                                                 alreadyExist = true;
+                                                                Log.i("NUMBER", Long.toString(numberOfAppointments));
+
                                                                 if (numberOfAppointments < 11) {
-                                                                    addAnAppointment();
+                                                                    Log.i("INFO", "appointment added");
                                                                     return;
                                                                 } else {
                                                                     Toast.makeText(getActivity(), "Sorry but there are no available appointments on " + pickDateTxtView.getText(), Toast.LENGTH_LONG).show();
                                                                 }
+                                                                return;
                                                             }
 
                                                             @Override
@@ -188,20 +196,28 @@ public class AppointmentFragment extends Fragment {
         });
 
         if(!alreadyExist){
+            Log.i("NE BI", "TREBALO DA UDJE");
             addAnAppointment();
+            return;
         }
     }
 
     public void addAnAppointment() {
-        FirebaseDatabase.getInstance().getReference().child("Appointments").child(pickDateTxtView.getText().toString()).push().setValue(appointment).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
-                    Toast.makeText(getActivity(), "Appointment successfully addedd", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity(), "Hmmm, something went wrong... Please try again.", Toast.LENGTH_SHORT).show();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString());
+        try {
+            databaseReference.push().setValue(appointment).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Toast.makeText(getActivity(), "Appointment successfully added", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getActivity(), "Hmmm, something went wrong... Please try again.", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+            Log.i("INFOE", "PROBLEM");
+        }
     }
 }
