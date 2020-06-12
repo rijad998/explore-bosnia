@@ -47,6 +47,7 @@ public class AppointmentFragment extends Fragment {
     DateC datec;
     Calendar c;
     DatePickerDialog dpd;
+    Boolean doExecute;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,7 +86,8 @@ public class AppointmentFragment extends Fragment {
                     Toast.makeText(getActivity(),"You need to pick a date for an appointment", Toast.LENGTH_LONG).show();
                 } else {
                     try {
-                        getAnAppointment();
+                        doExecute = true;
+                        createAnAppointment();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -96,7 +98,7 @@ public class AppointmentFragment extends Fragment {
         return v;
     }
 
-    public void getAnAppointment(){
+    public void createAnAppointment(){
         final String currentUserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         DatabaseReference userReference = FirebaseDatabase.getInstance().getReference().child("Users");
@@ -104,11 +106,9 @@ public class AppointmentFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
-                    Log.i("SNAPSHOTS", snapshot.getKey());
                     if (snapshot.getKey().equals(currentUserID)){
                         user = snapshot.getValue(User.class);
                         appointment = new Appointment(user.getName(), user.getPhone());
-                        Log.i("SNAPSHOT KEY USER", snapshot.getKey() + " " + currentUserID);
                         checkTheDatabase();
                         break;
                     }
@@ -124,100 +124,101 @@ public class AppointmentFragment extends Fragment {
 
     public void checkTheDatabase() {
 
-        alreadyExist = false;
-        final DatabaseReference userReference = FirebaseDatabase.getInstance().getReference().child("Appointments");
-        userReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            final DatabaseReference userReference = FirebaseDatabase.getInstance().getReference().child("Appointments");
+            userReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
 
-                   if (snapshot.getKey().equals(datec.getYear().toString())){
+                        if (snapshot.getKey().equals(datec.getYear().toString())) {
 
-                       FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshotK) {
-                                for(DataSnapshot snapshotM : dataSnapshotK.getChildren()){
+                            FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshotK) {
+                                    for (DataSnapshot snapshotM : dataSnapshotK.getChildren()) {
 
-                                    if (snapshotM.getKey().equals(datec.getMonth().toString())){
+                                        if (snapshotM.getKey().equals(datec.getMonth().toString())) {
 
-                                        FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).addValueEventListener(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(@NonNull DataSnapshot dataSnapshotL) {
-                                                for(DataSnapshot snapshotD : dataSnapshotL.getChildren()){
+                                            FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).addValueEventListener(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshotL) {
+                                                    for (DataSnapshot snapshotD : dataSnapshotL.getChildren()) {
 
-                                                    if (snapshotD.getKey().equals(datec.getDay().toString())){
+                                                        if (snapshotD.getKey().equals(datec.getDay().toString())) {
 
-                                                        FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString()).addValueEventListener(new ValueEventListener() {
-                                                            @Override
-                                                            public void onDataChange(@NonNull DataSnapshot dataSnapshotF) {
+                                                            FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString()).addValueEventListener(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshotF) {
 
-                                                                long numberOfAppointments = dataSnapshotF.getChildrenCount();
-                                                                alreadyExist = true;
-                                                                Log.i("NUMBER", Long.toString(numberOfAppointments));
-
-                                                                if (numberOfAppointments < 11) {
-                                                                    Log.i("INFO", "appointment added");
-                                                                    return;
-                                                                } else {
-                                                                    Toast.makeText(getActivity(), "Sorry but there are no available appointments on " + pickDateTxtView.getText(), Toast.LENGTH_LONG).show();
+                                                                    long numberOfAppointments = dataSnapshotF.getChildrenCount();
+                                                                    if (numberOfAppointments < 11) {
+                                                                        Log.i("Possible", "there is space");
+                                                                    } else {
+                                                                        Toast.makeText(getActivity(), "Sorry but there are no available appointments on " + pickDateTxtView.getText(), Toast.LENGTH_LONG).show();
+                                                                        doExecute=false;
+                                                                    }
                                                                 }
-                                                                return;
-                                                            }
 
-                                                            @Override
-                                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                                            }
-                                                        });
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                }
+                                                            });
+                                                        } else {
+                                                            addAnAppointment();
+                                                        }
                                                     }
                                                 }
-                                            }
 
-                                            @Override
-                                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                                            }
-                                        });
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                }
+                                            });
+                                        } else {
+                                            addAnAppointment();
+                                        }
                                     }
                                 }
-                            }
 
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError databaseError) {
-                            }
-                        });
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                }
+                            });
+                        } else {
+                            addAnAppointment();
+                        }
                     }
                 }
-            };
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                ;
 
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-        if(!alreadyExist){
-            Log.i("NE BI", "TREBALO DA UDJE");
-            addAnAppointment();
-            return;
+                }
+            });
         }
-    }
+
+
+
 
     public void addAnAppointment() {
+        if(doExecute){
+        doExecute = false;
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("Appointments").child(datec.getYear().toString()).child(datec.getMonth().toString()).child(datec.getDay().toString());
         try {
             databaseReference.push().setValue(appointment).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    if(task.isSuccessful()){
-                        Toast.makeText(getActivity(), "Appointment successfully added", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getActivity(), "Hmmm, something went wrong... Please try again.", Toast.LENGTH_SHORT).show();
-                    }
+                if(task.isSuccessful()){
+                    Toast.makeText(getActivity(), "Appointment successfully added", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Hmmm, something went wrong... Please try again.", Toast.LENGTH_SHORT).show();
+                }
                 }
             });
         } catch (Exception e){
             e.printStackTrace();
-            Log.i("INFOE", "PROBLEM");
         }
-    }
+    }}
 }

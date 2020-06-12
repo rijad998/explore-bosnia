@@ -37,6 +37,7 @@ public class AdminActivity extends AppCompatActivity {
     DateC datec;
     ListView adminAppointmentsLW;
     Button findAppointmentBtn;
+    PersonListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +89,8 @@ public class AdminActivity extends AppCompatActivity {
 
     public void returnTheAppointments(){
 
-        final ArrayList<String> list = new ArrayList<>();
-        final ArrayAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, list);
+        final ArrayList<Appointment> appointmentsList = new ArrayList<>();
+        adapter = new PersonListAdapter(AdminActivity.this, R.layout.adapter_view_layout, appointmentsList);
         adminAppointmentsLW.setAdapter(adapter);
 
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Appointments");
@@ -115,9 +116,10 @@ public class AdminActivity extends AppCompatActivity {
 
                                                             @Override
                                                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                                list.clear();
+                                                                appointmentsList.clear();
                                                                 for(DataSnapshot snapshotP : dataSnapshot.getChildren()){
-                                                                    list.add(snapshotP.getValue().toString());
+                                                                    Appointment appoint = snapshotP.getValue(Appointment.class);
+                                                                    appointmentsList.add(appoint);
                                                                 }
                                                                 adapter.notifyDataSetChanged();
                                                                 return;

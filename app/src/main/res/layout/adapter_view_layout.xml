@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/personNameAdminTextView"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="5dp"
+        android:text="Person name"
+        android:textAlignment="textStart"
+        android:textColor="#EE2937"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:ignore="RtlCompat" />
+
+    <TextView
+        android:id="@+id/phoneNumberAdminTextView"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="7dp"
+        android:text="Phone number"
+        android:textAlignment="textStart"
+        android:textColor="#5D1217"
+        android:textSize="14sp"
+        tools:ignore="RtlCompat" />
+
+</LinearLayout>
